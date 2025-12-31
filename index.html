@@ -1,411 +1,452 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>垂直上升烟花</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #000;
-            cursor: pointer;
-            height: 100vh;
-            width: 100vw;
-        }
-        
-        canvas {
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-        
-        .title {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            z-index: 2;
-            pointer-events: none;
-        }
-        
-        .control-panel {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 3;
-        }
-        
-        .control-btn {
-            padding: 10px 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid white;
-            border-radius: 20px;
-            font-family: Arial, sans-serif;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            min-width: 120px;
-        }
-        
-        .control-btn:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-        
-        .random-btn.on {
-            background-color: rgba(255, 215, 0, 0.5);
-            border-color: gold;
-        }
-        
-        .bless-btn.active {
-            background-color: rgba(255, 105, 180, 0.5);
-            border-color: hotpink;
-        }
 
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2026新年祝福 - 元旦快乐</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        crossorigin="anonymous" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind CSS 配置
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ef4444',
+                        secondary: '#f59e0b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+        .content-auto {
+          content-visibility: auto;
+        }
+        .text-shadow-glow {
+          text-shadow: 0 0 10px rgba(255, 215, 0, 0.7), 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        .animate-float {
+          animation: float 4s ease-in-out infinite;
+        }
+        .animate-float-delay-1 {
+          animation: float 4s ease-in-out 1s infinite;
+        }
+        .animate-float-delay-2 {
+          animation: float 4s ease-in-out 2s infinite;
+        }
+        .animate-float-delay-3 {
+          animation: float 4s ease-in-out 3s infinite;
+        }
+        .animate-pulse-soft {
+          animation: pulseSoft 2s ease-in-out infinite;
+        }
+        .animate-fade-in {
+          animation: fadeIn 1s ease-out forwards;
+        }
+        .animate-slide-up {
+          animation: slideUp 1s ease-out forwards;
+        }
+        .animate-slide-up-delay-1 {
+          animation: slideUp 1s ease-out 0.3s forwards;
+        }
+        .animate-slide-up-delay-2 {
+          animation: slideUp 1s ease-out 0.6s forwards;
+        }
+        .animate-slide-up-delay-3 {
+          animation: slideUp 1s ease-out 0.9s forwards;
+        }
+        .animate-scale-in {
+          animation: scaleIn 0.5s ease-out forwards;
+        }
+        .animate-glow {
+          animation: glow 2s ease-in-out infinite;
+        }
+      }
+
+      @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
+      }
+
+      @keyframes pulseSoft {
+        0% { opacity: 0.7; }
+        50% { opacity: 1; }
+        100% { opacity: 0.7; }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(50px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+      }
+
+      @keyframes glow {
+        0%, 100% { text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+        50% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+      }
+
+      /* 全局样式 */
+      html, body {
+        height: 100%;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      /* 雪花样式 */
+      .snowflake {
+        position: absolute;
+        background-color: white;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* 加载动画 */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #dc2626;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.8s ease-out;
+      }
+
+      .loading-hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
     </style>
 </head>
-<body>
-    <div class="title">点击任意位置放烟花</div>
-    <div class="control-panel">
-        <button class="control-btn random-btn">随机模式: 关</button>
-        <button class="control-btn bless-btn">发送祝福</button>
+
+<body class="bg-gradient-to-b from-red-800 via-red-700 to-red-900 text-white">
+    <!-- 加载动画 -->
+    <div id="loading-screen" class="loading-screen">
+        <h1 class="text-4xl font-bold text-white" id="loading-text">2026</h1>
     </div>
-    <canvas id="fireworks"></canvas>
+
+    <!-- 主要内容容器 -->
+    <div class="relative min-h-screen overflow-hidden">
+        <!-- 雪花容器 -->
+        <div id="snow-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+        <!-- 装饰星星 -->
+        <div class="absolute top-10 right-10 w-20 h-20">
+            <div class="animate-float">
+                <i class="fa-solid fa-star text-yellow-300 text-4xl animate-pulse-soft"></i>
+            </div>
+        </div>
+
+        <div class="absolute bottom-20 left-10 w-16 h-16">
+            <div class="animate-float-delay-1">
+                <i class="fa-solid fa-star text-yellow-300 text-3xl animate-pulse-soft"></i>
+            </div>
+        </div>
+
+        <!-- 主要内容 -->
+        <div class="container mx-auto px-4 py-16 relative z-10">
+            <!-- 标题部分 -->
+            <div class="text-center mb-12 opacity-0 animate-slide-up">
+                <h1
+                    class="text-4xl sm:text-6xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent animate-glow">
+                    2026新年快乐！
+                </h1>
+                <p class="text-xl sm:text-2xl text-yellow-100 opacity-0" id="subtitle">
+                    愿您新的一年里心想事成，万事如意
+                </p>
+            </div>
+
+            <!-- 倒计时部分 -->
+            <div class="text-center mb-16 opacity-0 animate-slide-up-delay-1">
+                <h2 class="text-2xl sm:text-3xl font-semibold mb-6">距离2026年还有</h2>
+                <div class="grid grid-cols-4 gap-4 sm:gap-8" id="countdown-container">
+                    <div class="flex flex-col items-center opacity-0">
+                        <div
+                            class="text-3xl sm:text-5xl font-bold text-white bg-gradient-to-r from-red-500 to-amber-500 p-4 sm:p-6 rounded-lg shadow-lg min-w-[80px] sm:min-w-[120px] text-center">
+                            <span id="days">00</span>
+                        </div>
+                        <div class="mt-2 text-white text-xs sm:text-sm">天</div>
+                    </div>
+                    <div class="flex flex-col items-center opacity-0">
+                        <div
+                            class="text-3xl sm:text-5xl font-bold text-white bg-gradient-to-r from-red-500 to-amber-500 p-4 sm:p-6 rounded-lg shadow-lg min-w-[80px] sm:min-w-[120px] text-center">
+                            <span id="hours">00</span>
+                        </div>
+                        <div class="mt-2 text-white text-xs sm:text-sm">时</div>
+                    </div>
+                    <div class="flex flex-col items-center opacity-0">
+                        <div
+                            class="text-3xl sm:text-5xl font-bold text-white bg-gradient-to-r from-red-500 to-amber-500 p-4 sm:p-6 rounded-lg shadow-lg min-w-[80px] sm:min-w-[120px] text-center">
+                            <span id="minutes">00</span>
+                        </div>
+                        <div class="mt-2 text-white text-xs sm:text-sm">分</div>
+                    </div>
+                    <div class="flex flex-col items-center opacity-0">
+                        <div
+                            class="text-3xl sm:text-5xl font-bold text-white bg-gradient-to-r from-red-500 to-amber-500 p-4 sm:p-6 rounded-lg shadow-lg min-w-[80px] sm:min-w-[120px] text-center">
+                            <span id="seconds">00</span>
+                        </div>
+                        <div class="mt-2 text-white text-xs sm:text-sm">秒</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 祝福卡片部分 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 opacity-0 animate-slide-up-delay-2">
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-xl hover:shadow-yellow-500/20 transition-all transform hover:scale-105 hover:rotate-1 cursor-pointer opacity-0"
+                    id="wish-card-1">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-yellow-400 text-3xl">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <p class="text-xl font-medium">身体健康，万事如意</p>
+                    </div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-xl hover:shadow-yellow-500/20 transition-all transform hover:scale-105 hover:-rotate-1 cursor-pointer opacity-0"
+                    id="wish-card-2">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-yellow-400 text-3xl">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <p class="text-xl font-medium">事业有成，财源广进</p>
+                    </div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-xl hover:shadow-yellow-500/20 transition-all transform hover:scale-105 hover:-rotate-1 cursor-pointer opacity-0"
+                    id="wish-card-3">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-yellow-400 text-3xl">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <p class="text-xl font-medium">家庭幸福，平安顺遂</p>
+                    </div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-xl hover:shadow-yellow-500/20 transition-all transform hover:scale-105 hover:rotate-1 cursor-pointer opacity-0"
+                    id="wish-card-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-yellow-400 text-3xl">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <p class="text-xl font-medium">心想事成，吉祥如意</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新年图片 -->
+            <div
+                class="relative mx-auto max-w-2xl rounded-2xl overflow-hidden shadow-2xl mb-16 opacity-0 animate-slide-up-delay-3">
+                <img src="https://space.coze.cn/api/coze_space/gen_image?image_size=landscape_16_9&prompt=New%20Year%202026%2C%20celebration%2C%20fireworks%2C%20happy%20people%2C%20chinese%20new%20year%20style&sign=7480eb84f78aa7d9bd5edaf5dc5aad19"
+                    alt="2026新年庆祝"
+                    class="w-full h-auto rounded-2xl transform transition-transform hover:scale-105 duration-700" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                    <p class="text-white p-6 text-lg">祝大家2026年元旦快乐！</p>
+                </div>
+            </div>
+
+            <!-- 按钮部分 -->
+            <div class="flex flex-wrap justify-center gap-4 opacity-0 animate-slide-up-delay-3">
+                <button
+                    class="bg-gradient-to-r from-yellow-500 to-amber-500 text-red-900 font-bold py-3 px-8 rounded-full text-lg shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/20 active:scale-95"
+                    id="share-button">
+                    <i class="fa-solid fa-share-alt mr-2"></i>分享祝福
+                </button>
+                <button
+                    class="bg-transparent border-2 border-yellow-500 text-yellow-500 font-bold py-3 px-8 rounded-full text-lg transform transition-all duration-300 hover:bg-yellow-500/10 hover:scale-105 active:scale-95"
+                    id="music-button">
+                    <i class="fa-solid fa-music mr-2"></i>播放音乐
+                </button>
+            </div>
+
+            <!-- 底部装饰 -->
+            <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-red-900 to-transparent opacity-0 animate-fade-in"
+                id="bottom-decoration"></div>
+
+            <!-- 底部文字 -->
+            <footer class="text-center mt-20 text-white/60 text-sm opacity-0 animate-fade-in" id="footer">
+                <p>© 2025 新年祝福页面 | 祝您新年快乐，阖家幸福</p>
+            </footer>
+        </div>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const canvas = document.getElementById('fireworks');
-            const ctx = canvas.getContext('2d');
-            const randomBtn = document.querySelector('.random-btn');
-            const blessBtn = document.querySelector('.bless-btn');
-            
-            // 设置canvas大小为窗口大小
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            // 窗口大小改变时重设canvas大小
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function () {
+            const loadingScreen = document.getElementById('loading-screen');
+            const loadingText = document.getElementById('loading-text');
+            const subtitle = document.getElementById('subtitle');
+            const countdownItems = document.querySelectorAll('#countdown-container > div');
+            const wishCards = document.querySelectorAll('[id^="wish-card-"]');
+            const bottomDecoration = document.getElementById('bottom-decoration');
+            const footer = document.getElementById('footer');
+
+            // 加载文字动画
+            loadingText.animate([
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.2)' },
+                { transform: 'scale(1)' }
+            ], {
+                duration: 1000,
+                iterations: Infinity
             });
-            
-            // 烟花颜色数组
-            const colors = [
-                '#FFB6C1', // 浅粉色
-                '#FFD700', // 金色
-                '#C0C0C0', // 银色
-                '#B0E0E6'  // 粉蓝色
-            ];
-            
-            // 烟花粒子数组
-            let particles = [];
-            // 上升中的烟花数组
-            let risingFireworks = [];
-            // 随机模式状态
-            let randomMode = false;
-            let randomInterval;
-            // 祝福语数组
-            const blessings = ["祝你天天快乐", "身体健康", "天天开心"];
-            let currentBlessingIndex = 0;
-            let isBlessingActive = false;
-            
-            // 鼠标点击事件
-            canvas.addEventListener('click', (e) => {
-                if (!isBlessingActive) {
-                    launchFirework(e.clientX, e.clientY);
-                }
-            });
-            
-            // 触摸事件（移动设备支持）
-            canvas.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (!isBlessingActive) {
-                    const touch = e.touches[0];
-                    launchFirework(touch.clientX, touch.clientY);
-                }
-            });
-            
-            // 随机放烟花按钮点击事件
-            randomBtn.addEventListener('click', () => {
-                if (isBlessingActive) return;
-                
-                randomMode = !randomMode;
-                
-                if (randomMode) {
-                    randomBtn.textContent = "随机模式: 开";
-                    randomBtn.classList.add('on');
-                    startRandomFireworks();
-                } else {
-                    randomBtn.textContent = "随机模式: 关";
-                    randomBtn.classList.remove('on');
-                    stopRandomFireworks();
-                }
-            });
-            
-            // 祝福按钮点击事件
-            blessBtn.addEventListener('click', () => {
-                if (randomMode) {
-                    randomMode = false;
-                    randomBtn.textContent = "随机模式: 关";
-                    randomBtn.classList.remove('on');
-                    stopRandomFireworks();
-                }
-                
-                isBlessingActive = true;
-                blessBtn.classList.add('active');
-                startBlessingSequence();
-            });
-            
-            // 开始随机放烟花
-            function startRandomFireworks() {
-                // 先立即放一个烟花
-                launchRandomFirework();
-                
-                // 设置定时器，每隔一段时间放烟花
-                randomInterval = setInterval(() => {
-                    launchRandomFirework();
-                }, 800); // 每800毫秒放一个烟花
-            }
-            
-            // 停止随机放烟花
-            function stopRandomFireworks() {
-                clearInterval(randomInterval);
-            }
-            
-            // 开始祝福语序列
-            function startBlessingSequence() {
-                currentBlessingIndex = 0;
-                launchBlessingFireworks(blessings[currentBlessingIndex]);
-            }
-            
-            // 发射祝福语烟花
-            function launchBlessingFireworks(text) {
-                // 发射一排烟花
-                const rowCount = 10;
-                const spacing = canvas.width / (rowCount + 1);
-                const yPos = canvas.height * 0.4;
-                
-                for (let i = 1; i <= rowCount; i++) {
-                    setTimeout(() => {
-                        launchFirework(i * spacing, yPos, true, text);
-                    }, i * 100);
-                }
-                
-                // 准备下一个祝福语
-                currentBlessingIndex++;
-                if (currentBlessingIndex < blessings.length) {
-                    setTimeout(() => {
-                        launchBlessingFireworks(blessings[currentBlessingIndex]);
-                    }, rowCount * 100 + 2000);
-                } else {
-                    setTimeout(() => {
-                        isBlessingActive = false;
-                        blessBtn.classList.remove('active');
-                    }, rowCount * 100 + 2000);
-                }
-            }
-            
-            // 发射随机位置的烟花
-            function launchRandomFirework() {
-                // 随机位置（水平位置随机，高度在屏幕上半部分）
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height * 0.6 + canvas.height * 0.2;
-                launchFirework(x, y);
-            }
-            
-            // 发射烟花（从底部垂直上升到目标高度）
-            function launchFirework(targetX, targetY, isBlessing = false, blessingText = "") {
-                const startX = targetX; // 从目标位置的正下方开始
-                const startY = canvas.height;
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                risingFireworks.push({
-                    x: startX,
-                    y: startY,
-                    targetY: targetY, // 只需要目标高度
-                    speed: 4 + Math.random() * 4,
-                    color: color,
-                    size: 3,
-                    arrived: false,
-                    isBlessing: isBlessing,
-                    blessingText: blessingText
-                });
-            }
-            
-            // 创建爆炸效果
-            function createExplosion(x, y, color, isBlessing = false, blessingText = "") {
-                if (isBlessing && blessingText) {
-                    createTextParticles(x, y, blessingText);
-                } else {
-                    const particleCount = 150;
-                    for (let i = 0; i < particleCount; i++) {
-                        const angle = Math.random() * Math.PI * 2;
-                        const speed = Math.random() * 10 + 4;
-                        const size = Math.random() * 3 + 1;
-                        const lifetime = Math.random() * 50 + 50;
-                        
-                        particles.push({
-                            x: x,
-                            y: y,
-                            vx: Math.cos(angle) * speed,
-                            vy: Math.sin(angle) * speed,
-                            size: size,
-                            color: color,
-                            alpha: 1,
-                            lifetime: lifetime,
-                            currentLife: 0,
-                            isText: false
-                        });
-                    }
-                }
-            }
-            
-            // 创建文字粒子
-            function createTextParticles(x, y, text) {
-                const fontSize = 20;
-                const textWidth = text.length * fontSize * 0.6;
-                const startX = x - textWidth / 2;
-                
-                // 临时canvas用于获取文字像素数据
-                const tempCanvas = document.createElement('canvas');
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCanvas.width = textWidth;
-                tempCanvas.height = fontSize * 2;
-                
-                tempCtx.font = `${fontSize}px Arial`;
-                tempCtx.fillStyle = '#FFFFFF';
-                tempCtx.textAlign = 'left';
-                tempCtx.textBaseline = 'top';
-                tempCtx.fillText(text, 0, 0);
-                
-                const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-                const data = imageData.data;
-                
-                // 遍历像素点，创建粒子
-                for (let i = 0; i < data.length; i += 4) {
-                    if (data[i + 3] > 128) { // 如果像素不透明
-                        const px = (i / 4) % tempCanvas.width;
-                        const py = Math.floor((i / 4) / tempCanvas.width);
-                        
-                        if (px % 2 === 0 && py % 2 === 0) { // 降低密度
-                            const angle = Math.random() * Math.PI * 2;
-                            const speed = Math.random() * 2 + 1;
-                            const size = Math.random() * 2 + 2;
-                            const lifetime = Math.random() * 100 + 150;
-                            
-                            particles.push({
-                                x: startX + px,
-                                y: y + py - fontSize,
-                                vx: Math.cos(angle) * speed,
-                                vy: Math.sin(angle) * speed,
-                                size: size,
-                                color: colors[Math.floor(Math.random() * colors.length)],
-                                alpha: 1,
-                                lifetime: lifetime,
-                                currentLife: 0,
-                                isText: true
-                            });
-                        }
-                    }
-                }
-            }
-            
-            // 动画循环
-            function animate() {
-                // 清除画布
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // 更新和绘制上升中的烟花
-                for (let i = 0; i < risingFireworks.length; i++) {
-                    const fw = risingFireworks[i];
-                    
-                    if (!fw.arrived) {
-                        // 垂直上升
-                        fw.y -= fw.speed;
-                        
-                        // 如果到达目标高度，则爆炸
-                        if (fw.y <= fw.targetY) {
-                            fw.arrived = true;
-                            createExplosion(fw.x, fw.y, fw.color, fw.isBlessing, fw.blessingText);
-                            // 移除这个上升的烟花
-                            risingFireworks.splice(i, 1);
-                            i--;
-                            continue;
-                        }
-                        
-                        // 绘制上升的烟花
-                        ctx.globalAlpha = 1;
-                        ctx.fillStyle = fw.color;
-                        ctx.beginPath();
-                        ctx.arc(fw.x, fw.y, fw.size, 0, Math.PI * 2);
-                        ctx.fill();
-                        
-                        // 绘制垂直尾迹
-                        ctx.globalAlpha = 0.3;
-                        ctx.beginPath();
-                        ctx.moveTo(fw.x, fw.y);
-                        ctx.lineTo(fw.x, fw.y + 10); // 垂直下方的尾迹
-                        ctx.strokeStyle = fw.color;
-                        ctx.lineWidth = 2;
-                        ctx.stroke();
-                    }
-                }
-                
-                // 更新和绘制爆炸粒子
-                for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-                    
-                    // 更新位置
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    
-                    // 重力效果（文字粒子重力较小）
-                    p.vy += p.isText ? 0.02 : 0.1;
-                    
-                    // 更新生命周期
-                    p.currentLife++;
-                    
-                    // 计算透明度
-                    p.alpha = 1 - (p.currentLife / p.lifetime);
-                    
-                    // 绘制粒子
-                    ctx.globalAlpha = p.alpha;
-                    ctx.fillStyle = p.color;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // 移除生命周期结束的粒子
-                    if (p.currentLife >= p.lifetime) {
-                        particles.splice(i, 1);
-                        i--;
-                    }
-                }
-                
-                requestAnimationFrame(animate);
-            }
-            
-            // 开始动画
-            animate();
-            
-            // 初始烟花效果
+
+            // 500ms后隐藏加载屏幕，显示主内容
             setTimeout(() => {
-                launchFirework(canvas.width / 2, canvas.height / 2);
-            }, 300);
+                loadingScreen.classList.add('loading-hidden');
+
+                // 显示副标题
+                setTimeout(() => {
+                    subtitle.classList.add('animate-fade-in');
+                }, 500);
+
+                // 显示倒计时项
+                countdownItems.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('animate-scale-in');
+                    }, 800 + index * 200);
+                });
+
+                // 显示祝福卡片
+                wishCards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('animate-scale-in');
+                    }, 1600 + index * 200);
+                });
+
+                // 显示底部装饰和页脚
+                setTimeout(() => {
+                    bottomDecoration.classList.add('animate-fade-in');
+                }, 2400);
+
+                setTimeout(() => {
+                    footer.classList.add('animate-fade-in');
+                }, 2800);
+            }, 1000);
+
+            // 初始化倒计时
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+
+            // 初始化雪花效果
+            createSnowflakes();
+
+            // 按钮事件处理
+            document.getElementById('share-button').addEventListener('click', function () {
+                alert('祝福已分享！');
+            });
+
+            document.getElementById('music-button').addEventListener('click', function () {
+                alert('音乐播放功能即将上线！');
+            });
         });
+
+        // 倒计时功能
+        function updateCountdown() {
+            const now = new Date();
+            const newYear = new Date(2026, 0, 1, 0, 0, 0, 0);
+            const difference = newYear.getTime() - now.getTime();
+
+            if (difference > 0) {
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((difference / 1000 / 60) % 60);
+                const seconds = Math.floor((difference / 1000) % 60);
+
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            } else {
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+            }
+        }
+
+        // 雪花效果
+        function createSnowflakes() {
+            const snowContainer = document.getElementById('snow-container');
+            const particleCount = window.innerWidth < 768 ? 20 : 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                createSnowflake(snowContainer, i);
+            }
+
+            // 窗口大小改变时重新创建雪花
+            window.addEventListener('resize', function () {
+                while (snowContainer.firstChild) {
+                    snowContainer.removeChild(snowContainer.firstChild);
+                }
+                const newParticleCount = window.innerWidth < 768 ? 20 : 50;
+                for (let i = 0; i < newParticleCount; i++) {
+                    createSnowflake(snowContainer, i);
+                }
+            });
+        }
+
+        function createSnowflake(container, index) {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+
+            // 随机属性
+            const size = Math.random() * 5 + 2;
+            const x = Math.random() * 100;
+            const duration = Math.random() * 10 + 5;
+            const delay = Math.random() * 5;
+            const opacity = Math.random() * 0.5 + 0.3;
+
+            // 设置样式
+            snowflake.style.left = `${x}%`;
+            snowflake.style.top = '-20px';
+            snowflake.style.width = `${size}px`;
+            snowflake.style.height = `${size}px`;
+            snowflake.style.opacity = `${opacity}`;
+
+            // 添加到容器
+            container.appendChild(snowflake);
+
+            // 创建动画
+            snowflake.animate(
+                [
+                    { transform: 'translate(0, -20px) rotate(0deg)' },
+                    { transform: `translate(${Math.sin(duration) * 50}px, 100vh) rotate(90deg)` },
+                    { transform: `translate(${-Math.sin(duration) * 25}px, 100vh) rotate(180deg)` },
+                    { transform: 'translate(0, 100vh) rotate(360deg)' },
+                ],
+                {
+                    duration: duration * 1000,
+                    delay: delay * 1000,
+                    iterations: Infinity,
+                    easing: 'linear'
+                }
+            );
+        }
     </script>
 </body>
 
-</html> 
-
+</html>
